@@ -29,6 +29,8 @@ namespace LecturerClaimsApp.Controllers
 
         // POST: /LecturerClaims/Create
         // This method handles the form submission for creating a new claim
+
+
         [HttpPost]
         public IActionResult Create(LecturerClaim newClaim)
         {
@@ -47,29 +49,28 @@ namespace LecturerClaimsApp.Controllers
         }
 
         // POST: /LecturerClaims/Approve/5
-        // This method allows approving a claim
-        [HttpPost]
-        public IActionResult Approve(int id)
-        {
-            var claim = _claims.FirstOrDefault(c => c.ClaimId == id);
-            if (claim != null)
-            {
-                claim.Status = "Approved";
-            }
-            return RedirectToAction("Index");
-        }
+[HttpPost]
+public IActionResult Approve(int id)
+{
+    var claim = _claims.FirstOrDefault(c => c.ClaimId == id);
+    if (claim != null)
+    {
+        claim.Status = "Accepted"; // Updated to "Accepted"
+    }
+    return RedirectToAction("Index");
+}
 
-        // POST: /LecturerClaims/Reject/5
-        // This method allows rejecting a claim
-        [HttpPost]
-        public IActionResult Reject(int id)
-        {
-            var claim = _claims.FirstOrDefault(c => c.ClaimId == id);
-            if (claim != null)
-            {
-                claim.Status = "Rejected";
-            }
-            return RedirectToAction("Index");
-        }
+// POST: /LecturerClaims/Reject/5
+[HttpPost]
+public IActionResult Reject(int id)
+{
+    var claim = _claims.FirstOrDefault(c => c.ClaimId == id);
+    if (claim != null)
+    {
+        claim.Status = "Rejected"; // Remains "Rejected"
+    }
+    return RedirectToAction("Index");
+}
+
     }
 }
