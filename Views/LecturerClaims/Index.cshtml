@@ -3,17 +3,13 @@
 <div class="container mt-4">
     <h2>Manage Lecturer Claims</h2>
 
-    <!-- Link to Create a New Claim -->
-    <div class="mb-4">
-        <a asp-action="Create" class="btn btn-primary">Submit a New Claim</a>
-    </div>
-
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Lecturer</th>
                 <th>Hours Worked</th>
                 <th>Hourly Rate</th>
+                <th>Final Payment</th>
                 <th>Notes</th>
                 <th>Document</th>
                 <th>Status</th>
@@ -24,10 +20,27 @@
             @for (int i = 0; i < Model.Count(); i++)
             {
                 var claim = Model.ElementAt(i);
+                string autoStatus;
+
+                // Automate the status determination
+                if (claim.HourlyRate > 150 || claim.HoursWorked > 280)
+                {
+                    autoStatus = "Rejected";
+                }
+                else if (claim.HourlyRate == 150 || claim.HoursWorked == 280)
+                {
+                    autoStatus = "Approved";
+                }
+                else
+                {
+                    autoStatus = "Pending";
+                }
+
                 <tr>
-                    <td>@claim.LecturerName</td>
+                    <td class="lecturer-name">@claim.LecturerName</td>
                     <td>@claim.HoursWorked</td>
                     <td>@claim.HourlyRate</td>
+                    <td>@(claim.HoursWorked * claim.HourlyRate)</td> <!-- Calculating Final Payment -->
                     <td>@claim.AdditionalNotes</td>
                     <td>
                         @if (!string.IsNullOrEmpty(claim.DocumentPath))
@@ -35,20 +48,80 @@
                             <a href="@claim.DocumentPath" target="_blank">View Document</a>
                         }
                     </td>
-                    <td>@claim.Status</td>
+                    <td>@autoStatus</td>
                     <td>
-                        @if (claim.Status == "Pending")
+                        @if (autoStatus == "Pending")
                         {
-                            <form asp-action="Approve" asp-route-id="@claim.ClaimId" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            <form asp-action="Approve" asp-route-id="@claim.ClaimId" method="post" class="d-block mb-2">
+                                <button type="submit" class="btn btn-success btn-sm w-100">Approve</button>
                             </form>
-                            <form asp-action="Reject" asp-route-id="@claim.ClaimId" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            <form asp-action="Reject" asp-route-id="@claim.ClaimId" method="post" class="d-block">
+                                <button type="submit" class="btn btn-danger btn-sm w-100">Reject</button>
                             </form>
+                        }
+                        else if (autoStatus == "Rejected")
+                        {
+                            <span class="text-danger">Rejected Automatically</span>
+                        }
+                        else if (autoStatus == "Approved")
+                        {
+                            <span class="text-success">Approved Automatically</span>
                         }
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+
+    <!-- HR View Section -->
+    <h3 class="mt-5">HR View: Approved Claims Summary</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Lecturer</th>
+                <th>Hours Worked</th>
+                <th>Hourly Rate</th>
+                <th>Final Payment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Model.Where(c => c.HourlyRate == 150 || c.HoursWorked == 280))
+            {
+                <tr>
+                    <td class="lecturer-name">@claim.LecturerName</td>
+                    <td>@claim.HoursWorked</td>
+                    <td>@claim.HourlyRate</td>
+                    <td>@(claim.HoursWorked * claim.HourlyRate)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Lecturer Management Section -->
+    <h3 class="mt-5">Manage Lecturer Data</h3>
+    <form asp-action="UpdateLecturer" method="post" onsubmit="updateLecturerName(event)">
+        <div class="form-group">
+            <label for="LecturerName">Name</label>
+            <input type="text" name="LecturerName" id="LecturerName" class="form-control" placeholder="Enter name" />
+        </div>
+        <div class="form-group">
+            <label for="LecturerContact">Contact</label>
+            <input type="text" name="LecturerContact" id="LecturerContact" class="form-control" placeholder="Enter contact details" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Update Lecturer</button>
+    </form>
 </div>
+
+<script>
+    function updateLecturerName(event) {
+        event.preventDefault();
+
+        // Get the new name from the form
+        const newName = document.getElementById('LecturerName').value;
+
+        // Update all occurrences of the lecturer's name in the table
+        document.querySelectorAll('.lecturer-name').forEach(el => {
+            el.textContent = newName;
+        });
+    }
+</script>

@@ -1,24 +1,26 @@
 body {
-    background-color: peachpuff;
-    font-family: 'Roboto', sans-serif;
-
+    background-color: lightblue;
 }
 
-
-.container {
-    max-width: 900px;
-    margin: 0 auto;
+h2 {
+    color: blue;
 }
 
-h1, h2 {
-    color: #333;
-    text-align: center;
+.form-group label {
+    color: white;
 }
 
-.table {
-    margin-top: 20px;
+.form-control {
+    border-color: blue;
+    background-color: lightblue;
+    color: white;
 }
 
-.btn {
-    margin-right: 5px;
+.btn-primary {
+    background-color: blue;
+    border-color: lightblue;
+}
+
+form {
+    padding: 20px;
 }
